@@ -1,143 +1,140 @@
-# STITCHORA — Haute Couture & Bespoke Fashion E-Commerce
+# Muskan's Stitching — Haute Couture & Bespoke Fashion E-Commerce
 
-> *"Stitched for You"*
+> *"Stitched for You — Bespoke Couture & Tailoring"*
 
-A full-stack luxury Indian fashion e-commerce platform specializing in women's ethnic wear, designer suits, layered georgette ensembles, co-ord sets, party wear, and festive contemporary couture.
-
----
-
-## Brand Visual Identity
-- **Primary Palette**:
-  - Warm Ivory: `#F8F0E6`
-  - Espresso Brown: `#3B2118`
-  - Muted Mauve: `#B77D8D`
-  - Soft Beige: `#E8D9C8`
-- **Typography**:
-  - Headings: *Cormorant Garamond* (Editorial Luxury Serif)
-  - Body & Numbers: *Plus Jakarta Sans* (Refined Clean Sans-Serif with Tabular Numerals)
-- **Brand Monogram**: Needle threaded through the iconic serif 'S' with calligraphic flourishing loops and diamond star insignia.
-- **Hero Silhouette**: The Mauve Tiered Georgette Ensemble (inspired by the uploaded reference image).
+A production-grade, mobile-friendly full-stack luxury Indian fashion e-commerce boutique specializing in women's ethnic wear, designer suits, layered georgette ensembles, co-ord sets, party wear, and festive contemporary couture.
 
 ---
 
-## Key Features
-
-1. **Homepage Experience**:
-   - Slim dismissible announcement bar with coupon promotion.
-   - 3-Zone Top Bar with sticky header and mobile navigation drawer.
-   - Full-width editorial hero campaign banner with high-resolution editorial photography.
-   - Curated category portfolios: Ethnic Suits, Co-ord Sets, Party Wear, Festive Wear, and New Arrivals.
-   - Star Spotlight on **The Mauve Tiered Georgette Ensemble** with quick-size selection and craftsmanship notes.
-   - Best Sellers and Trending Now catalog grid.
-   - Artisanal craft storytelling ("The Art of Stitchora").
-   - Verified buyer reviews and testimonials.
-   - VIP newsletter subscription with instant validation.
-
-2. **Catalog & Product Detail Page (PDP)**:
-   - Multi-faceted filtering by category, size (XS to XXL), price range, and sorting.
-   - High-definition image gallery with thumbnail switcher.
-   - Contiguous purchase module with live inventory status.
-   - Comprehensive Size Guide with inches/cm toggle and custom tailoring guarantee.
-   - Indian PIN Code delivery estimator with instant date calculation.
-   - Verified customer reviews with submission form.
-
-3. **Shopping Bag & Checkout**:
-   - Slide-out Cart Drawer with complimentary shipping progress bar.
-   - Server-authoritative price and inventory verification (`/api/checkout/quote`).
-   - Coupon codes (`WELCOME10`, `FESTIVE15`, `STITCHORA500`) validated server-side.
-   - Guest and authenticated checkout with full delivery address and special instructions.
-   - Razorpay Indian payment gateway simulator with UPI, Cards, and Netbanking.
-   - Server-side HMAC-SHA256 signature verification (`/api/payment/verify`).
-   - Cash on Delivery (COD) support.
-
-4. **Order Tracking & Account**:
-   - Post-order confirmation screen with printable tax invoice receipt.
-   - Real-time consignment tracking timeline (`CONFIRMED` → `PROCESSING` → `SHIPPED` → `OUT_FOR_DELIVERY` → `DELIVERED`).
-   - Customer account with order history, address book, and wishlist management.
-
-5. **Protected Admin Dashboard**:
-   - Role-based access control (Admin role only).
-   - Overview metrics: Gross revenue, total orders, customers, and low stock inventory alerts.
-   - Product catalog management: Create new silhouette, upload images, manage variants and pricing.
-   - Order fulfillment manager: Update order status and assign courier AWB tracking numbers.
-   - Discount coupon management and site settings (toggle COD, free shipping threshold).
+## 🚀 Live & Deployment Status
+- **Development App URL**: Accessible through AI Studio preview on port 3000
+- **Supabase Backend Project**: `ogiiheusnnyzqzltontv` (`https://ogiiheusnnyzqzltontv.supabase.co`)
+- **Admin Email**: `muskandevi2465@gmail.com`
+- **Git Branch**: `main`
 
 ---
 
-## Technology Stack
+## 📦 Connecting to GitHub & Pushing Your Code
 
-- **Frontend**: React 19, TypeScript, Tailwind CSS v4, Lucide Icons
-- **Backend**: Express full-stack server running with Vite middleware integration
-- **Database Engine**: Persistent store with full PostgreSQL DDL schema & Prisma definitions
-- **ORM & Migrations**: Prisma schema (`prisma/schema.prisma`) and initial SQL migration (`prisma/migrations/20260401_init/migration.sql`)
-- **Payments**: Razorpay Indian Payment Gateway integration with server HMAC signature validation
+Follow these straightforward steps to connect this repository to your personal or organization GitHub account:
 
----
+### 1. Create a New Repository on GitHub
+1. Go to [GitHub New Repository](https://github.com/new).
+2. Set the repository name to: **`muskans-stitching`** (or your preferred name).
+3. Choose **Public** or **Private**.
+4. **Leave "Add a README file", ".gitignore", and "license" UNCHECKED** (since your project already has them).
+5. Click **Create repository**.
 
-## Demo Accounts & Credentials
+### 2. Connect Your Local Git to GitHub
+In your terminal, run:
 
-### Administrator Account
-- **Email**: `admin@stitchora.com`
-- **Password**: `admin123`
-- *Access*: Admin Dashboard (`/admin`), Product creation/deletion, order dispatching, coupon controls.
-
-### Customer Account
-- **Email**: `muskan@stitchora.com`
-- **Password**: `customer123`
-- *Access*: Pre-loaded with order history and default delivery address.
-
-### Active Promotional Coupons
-- `WELCOME10`: 10% off on cart orders above ₹2,999
-- `FESTIVE15`: 15% off on festive collections above ₹4,999
-- `STITCHORA500`: Flat ₹500 off on cart orders above ₹3,500
-
----
-
-## Local Development Instructions
-
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-
-2. **Configure Environment Variables**:
-   Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-
-3. **Start Full-Stack Development Server**:
-   ```bash
-   npm run dev
-   ```
-   The application will start on `http://localhost:3000`.
-
-4. **Production Build**:
-   ```bash
-   npm run build
-   npm start
-   ```
-
----
-
-## Setting Up External Production Credentials
-
-### 1. PostgreSQL & Prisma (Production DB)
-Update `DATABASE_URL` in your `.env`:
-```env
-DATABASE_URL="postgresql://<user>:<password>@<host>:5432/<dbname>?schema=public"
-```
-Apply the database schema:
 ```bash
-npx prisma migrate deploy
+# Add your GitHub repository as the remote origin:
+git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/muskans-stitching.git
+
+# Verify remote configuration:
+git remote -v
+
+# Push all files to GitHub:
+git push -u origin main
 ```
 
-### 2. Razorpay Indian Payments
-1. Create a merchant account at [Razorpay Dashboard](https://dashboard.razorpay.com).
-2. Generate your API keys from **Settings → API Keys**.
-3. Set the keys in `.env`:
-   ```env
-   RAZORPAY_KEY_ID="rzp_live_your_key_id"
-   RAZORPAY_KEY_SECRET="your_key_secret"
-   ```
-4. The server automatically verifies transactions using HMAC-SHA256 signature calculation.
+*(If prompted for authentication, enter your GitHub Personal Access Token with `repo` permissions or sign in via browser.)*
+
+### 3. Future Updates & Continuous Pushing
+Whenever you make updates to the website:
+```bash
+git add .
+git commit -m "feat: update store content and styles"
+git push
+```
+
+---
+
+## 🌐 Connecting a Custom Domain (e.g. `muskansstitching.com`)
+
+You can connect your custom domain bought from GoDaddy, Namecheap, Hostinger, Cloudflare, or Google Domains.
+
+### Option A: Hosting on Vercel (Recommended for Next.js / Vite)
+1. Import your GitHub repository into [Vercel](https://vercel.com/new).
+2. In your Vercel Project Dashboard, navigate to **Settings → Domains**.
+3. Enter your domain name (e.g. `muskansstitching.com` or `www.muskansstitching.com`).
+4. Vercel will provide the exact DNS records to add at your domain registrar:
+   - **Apex / Root Domain (`@`)**:
+     - **Type**: `A`
+     - **Name / Host**: `@` (or leave empty)
+     - **Value / IP**: `76.76.21.21`
+   - **Subdomain (`www`)**:
+     - **Type**: `CNAME`
+     - **Name / Host**: `www`
+     - **Value / Target**: `cname.vercel-dns.com`
+5. Vercel automatically provisions and renews a free **SSL / HTTPS Certificate** within 5–15 minutes.
+
+### Option B: Hosting on Render / Railway (Full-Stack Node.js + Express)
+1. Create a **Web Service** on [Render](https://render.com) or [Railway](https://railway.app).
+2. Connect your GitHub repository `muskans-stitching`.
+3. Set Build Command: `npm run build`
+4. Set Start Command: `npm start`
+5. Go to **Settings → Custom Domains** → Add your custom domain.
+6. Configure the DNS CNAME record provided by Render/Railway at your domain registrar.
+
+### DNS Propagation Check
+You can check if your new DNS records are live globally at [whatsmydns.net](https://www.whatsmydns.net). Propagation usually takes 5 to 30 minutes.
+
+---
+
+## ⚙️ Production Environment Variables
+
+Add these variables in your hosting dashboard (**Settings → Environment Variables**):
+
+| Variable | Description | Example / Default |
+|---|---|---|
+| `PORT` | Web server port | `3000` |
+| `SESSION_SECRET` | Secret key for JWT sessions | `your_secure_random_string` |
+| `SUPABASE_PROJECT_ID` | Your Supabase Project Reference | `ogiiheusnnyzqzltontv` |
+| `SUPABASE_URL` | Supabase API URL | `https://ogiiheusnnyzqzltontv.supabase.co` |
+| `SUPABASE_ANON_KEY` | Supabase Project Anon Public Key | Obtained from Supabase Settings → API |
+| `RAZORPAY_KEY_ID` | Razorpay Merchant Key ID | `rzp_live_...` |
+| `RAZORPAY_KEY_SECRET` | Razorpay Merchant Secret | `your_razorpay_secret` |
+
+---
+
+## 🎨 Visual Identity & Architecture
+
+- **Branding**: Muskan's Stitching
+- **Primary Color Palette**:
+  - Espresso Luxury Brown: `#3B2118`
+  - Warm Ivory Canvas: `#FAF5EE` / `#F8F0E6`
+  - Rose Silk Mauve: `#D8B4C0` / `#8F5567`
+  - Heritage Beige: `#E8D9C8`
+- **Typography**: Clean, bold Canva Sans / Plus Jakarta Sans font hierarchy with high legibility across mobile and desktop.
+- **Craft Emblem**: Custom vector sewing needle in polished gold with flowing rose-silk tailoring thread, basting stitches, cardinal cross-stitch accents, and central "M" monogram.
+- **Mobile First**: 100% responsive, optimized tap targets, smooth slide-out cart drawer, collapsible navigation drawer, and instant one-tap checkout.
+
+---
+
+## 🔒 Protected Admin Dashboard
+
+- **Authorized Owner Email**: `muskandevi2465@gmail.com`
+- **Admin Login & Forgot Password**: Secure verification code sent directly for email recovery.
+- **Features**:
+  1. Product Catalog: Add, edit, delete silhouettes, upload pictures, adjust prices.
+  2. Order Management: View customer orders, update tracking numbers and fulfillment status.
+  3. Supabase Integration Tab: Real-time sync of all orders, 1-click SQL schema generator, and live connection verification.
+  4. Coupons & Settings: Activate discount codes, configure COD and free shipping thresholds.
+
+---
+
+## 💻 Local Development
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start full-stack development server
+npm run dev
+
+# 3. Build for production
+npm run build
+npm start
+```
