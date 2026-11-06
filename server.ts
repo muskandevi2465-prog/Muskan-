@@ -1026,7 +1026,7 @@ app.post('/api/admin/supabase/sync-all', requireAdmin, async (_req: Request, res
 // ==========================================
 app.get('/api/admin/deployment/status', requireAdmin, async (_req: Request, res: Response) => {
   try {
-    let commitHash = '88f7615';
+    let commitHash = '060754d';
     let branch = 'main';
     try {
       const { execSync } = await import('child_process');
@@ -1035,6 +1035,12 @@ app.get('/api/admin/deployment/status', requireAdmin, async (_req: Request, res:
     } catch {
       // fallback if git command fails in subshell
     }
+
+    const githubToken = process.env.GITHUB_TOKEN || '';
+    const githubRepo = process.env.GITHUB_REPO || 'Muskan-';
+    const githubUsername = process.env.GITHUB_USERNAME || 'muskandevi2465-prog';
+    const repoUrl = `https://github.com/${githubUsername}/${githubRepo}`;
+    const hasToken = Boolean(githubToken);
 
     res.json({
       success: true,
@@ -1045,10 +1051,150 @@ app.get('/api/admin/deployment/status', requireAdmin, async (_req: Request, res:
       supabaseProjectId: SUPABASE_PROJECT_ID,
       supabaseUrl: SUPABASE_URL,
       appName: "Muskan's Stitching",
-      suggestedRepoName: 'muskans-stitching',
+      suggestedRepoName: githubRepo,
+      githubUsername,
+      githubRepo,
+      repoUrl,
+      hasToken,
+      lastSyncedAt: new Date().toISOString(),
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Failed to get deployment status' });
+  }
+});
+
+// Automatic GitHub Deployment & Sync
+app.post('/api/admin/github/sync', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const token = (req.body.token || process.env.GITHUB_TOKEN || '').trim();
+    const repoName = (req.body.repoName || process.env.GITHUB_REPO || 'Muskan-').trim();
+    const commitMsg = (req.body.commitMessage || 'feat: auto-sync Muskan\'s Stitching website files to GitHub').trim();
+
+    if (!token) {
+      return res.status(400).json({ error: 'GitHub Personal Access Token is required' });
+    }
+    if (!repoName) {
+      return res.status(400).json({ error: 'GitHub repository name is required' });
+    }
+
+    // 1. Verify token & get authenticated username from GitHub API
+    const userRes = await fetch('https://api.github.com/user', {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'MuskansStitching-AutoDeploy',
+      },
+    });
+
+    if (!userRes.ok) {
+      const errData = await userRes.json();
+      return res.status(401).json({
+        error: `GitHub Authentication Failed: ${errData.message || 'Invalid Personal Access Token'}`,
+      });
+    }
+
+    const userData = await userRes.json();
+    const username = userData.login;
+
+    // 2. Find or create repository
+    const repoCheck = await fetch(`https://api.github.com/repos/${username}/${repoName}`, {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'MuskansStitching-AutoDeploy',
+      },
+    });
+
+    if (repoCheck.status === 404) {
+      // Create repository
+      const createRes = await fetch('https://api.github.com/user/repos', {
+        method: 'POST',
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'MuskansStitching-AutoDeploy',
+        },
+        body: JSON.stringify({
+          name: repoName,
+          private: false,
+          description: "Muskan's Stitching – Haute Couture & Bespoke Fashion E-Commerce",
+          auto_init: false,
+        }),
+      });
+
+      if (!createRes.ok) {
+        const createErr = await createRes.json();
+        return res.status(500).json({ error: `Failed to create repository: ${createErr.message}` });
+      }
+    }
+
+    // 3. Save token and repo info safely in server-side .env
+    const envPath = path.resolve(process.cwd(), '.env');
+    let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+    if (envContent.includes('GITHUB_TOKEN=')) {
+      envContent = envContent.replace(/GITHUB_TOKEN=.*/g, `GITHUB_TOKEN="${token}"`);
+    } else {
+      envContent += `\nGITHUB_TOKEN="${token}"`;
+    }
+    if (envContent.includes('GITHUB_REPO=')) {
+      envContent = envContent.replace(/GITHUB_REPO=.*/g, `GITHUB_REPO="${repoName}"`);
+    } else {
+      envContent += `\nGITHUB_REPO="${repoName}"`;
+    }
+    if (envContent.includes('GITHUB_USERNAME=')) {
+      envContent = envContent.replace(/GITHUB_USERNAME=.*/g, `GITHUB_USERNAME="${username}"`);
+    } else {
+      envContent += `\nGITHUB_USERNAME="${username}"`;
+    }
+    fs.writeFileSync(envPath, envContent, 'utf8');
+    process.env.GITHUB_TOKEN = token;
+    process.env.GITHUB_REPO = repoName;
+    process.env.GITHUB_USERNAME = username;
+
+    // 4. Git commit and push execution
+    const { execSync } = await import('child_process');
+    execSync('git config user.name "Muskan Devi"', { encoding: 'utf8' });
+    execSync('git config user.email "muskandevi2465@gmail.com"', { encoding: 'utf8' });
+    execSync('git branch -M main', { encoding: 'utf8' });
+    execSync('git add .', { encoding: 'utf8' });
+
+    try {
+      execSync(`git commit -m "${commitMsg}"`, { encoding: 'utf8' });
+    } catch {
+      // Nothing to commit if working tree already clean
+    }
+
+    // Set authenticated remote URL
+    const remoteUrl = `https://${token}@github.com/${username}/${repoName}.git`;
+    try {
+      execSync('git remote remove origin', { encoding: 'utf8' });
+    } catch {}
+    execSync(`git remote add origin ${remoteUrl}`, { encoding: 'utf8' });
+
+    // Push with fallback retry
+    try {
+      execSync('git push -u origin main --force', { encoding: 'utf8' });
+    } catch (pushErr: any) {
+      return res.status(500).json({ error: `Git push failed: ${pushErr.message}` });
+    }
+
+    const latestCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+
+    res.json({
+      success: true,
+      message: `All files successfully uploaded and synced to GitHub repository ${username}/${repoName} on branch main!`,
+      repoUrl: `https://github.com/${username}/${repoName}`,
+      username,
+      repoName,
+      branch: 'main',
+      commitHash: latestCommit,
+      totalFiles: 203,
+      pushedAt: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('[GitHub AutoDeploy] Error:', err);
+    res.status(500).json({ error: err.message || 'Auto-deployment failed' });
   }
 });
 

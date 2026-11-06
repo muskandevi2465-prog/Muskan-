@@ -572,5 +572,19 @@ export const api = {
     if (!res.ok) throw new Error(data.error || 'Failed to fetch deployment status');
     return data;
   },
+
+  async syncToGithub(payload: { token?: string; repoName?: string; commitMessage?: string }): Promise<any> {
+    const res = await fetch(`${API_BASE}/admin/github/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to sync with GitHub');
+    return data;
+  },
 };
 

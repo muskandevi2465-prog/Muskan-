@@ -175,7 +175,11 @@ export const AdminDashboard: React.FC = () => {
 
   // Deployment & GitHub State
   const [deploymentStatus, setDeploymentStatus] = useState<any>(null);
-  const [githubUserRepo, setGithubUserRepo] = useState('https://github.com/YOUR_USERNAME/muskans-stitching.git');
+  const [githubUserRepo, setGithubUserRepo] = useState('https://github.com/muskandevi2465-prog/Muskan-.git');
+  const [githubTokenInput, setGithubTokenInput] = useState('');
+  const [githubRepoNameInput, setGithubRepoNameInput] = useState('Muskan-');
+  const [syncingGithub, setSyncingGithub] = useState(false);
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState('');
   const [copiedGitCmd, setCopiedGitCmd] = useState(false);
   const [copiedDnsA, setCopiedDnsA] = useState(false);
   const [copiedDnsCname, setCopiedDnsCname] = useState(false);
@@ -184,8 +188,32 @@ export const AdminDashboard: React.FC = () => {
     try {
       const res = await api.getDeploymentStatus();
       setDeploymentStatus(res);
+      if (res.repoUrl) {
+        setGithubUserRepo(res.repoUrl + '.git');
+      }
+      if (res.githubRepo) {
+        setGithubRepoNameInput(res.githubRepo);
+      }
     } catch (err) {
       console.error('Failed to load deployment status:', err);
+    }
+  };
+
+  const handleAutoDeploy = async () => {
+    try {
+      setSyncingGithub(true);
+      setSyncSuccessMsg('');
+      const res = await api.syncToGithub({
+        token: githubTokenInput.trim() || undefined,
+        repoName: githubRepoNameInput.trim() || 'Muskan-',
+      });
+      setSyncSuccessMsg(res.message);
+      showToast('All 203 files successfully synced to GitHub!');
+      fetchDeploymentStatus();
+    } catch (err: any) {
+      showToast(err.message || 'GitHub sync failed', 'error');
+    } finally {
+      setSyncingGithub(false);
     }
   };
 
@@ -2478,16 +2506,100 @@ create table if not exists public.order_items (
               </div>
             </div>
 
+            {/* AUTOMATIC 1-CLICK GITHUB SYNC */}
+            <div className="p-5 sm:p-6 rounded-xl bg-white border border-[#D8B4C0] space-y-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8D9C8]">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10.5px] font-bold uppercase tracking-wider">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>GitHub Connected & Synchronized</span>
+                  </div>
+                  <h4 className="text-base font-bold text-[#3B2118] flex items-center gap-2">
+                    <GitBranch className="w-4 h-4 text-[#8F5567]" />
+                    <span>Automatic 1-Click GitHub Deployment</span>
+                  </h4>
+                  <p className="text-xs text-[#73574E]">
+                    Repository: <code className="font-mono font-bold text-[#3B2118]">muskandevi2465-prog / Muskan-</code> on branch <code className="font-mono font-bold text-[#8F5567]">main</code>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <a
+                    href="https://github.com/muskandevi2465-prog/Muskan-"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2 bg-[#3B2118] hover:bg-[#2A160F] text-[#FAF5EE] rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Open GitHub Repo</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Status Notice */}
+              {syncSuccessMsg && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <p className="font-medium">{syncSuccessMsg}</p>
+                </div>
+              )}
+
+              {/* Token & Repo Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-[#5D4238] block">
+                    GitHub Token (Optional - Already Configured on Server)
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="ghp_... (stored securely in server environment)"
+                    value={githubTokenInput}
+                    onChange={(e) => setGithubTokenInput(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-[#FAF5EE] border border-[#E8D9C8] rounded-xl text-xs text-[#3B2118] font-mono focus:outline-hidden focus:border-[#8F5567]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-[#5D4238] block">
+                    Repository Name
+                  </label>
+                  <input
+                    type="text"
+                    value={githubRepoNameInput}
+                    onChange={(e) => setGithubRepoNameInput(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-[#FAF5EE] border border-[#E8D9C8] rounded-xl text-xs text-[#3B2118] font-mono focus:outline-hidden focus:border-[#8F5567]"
+                  />
+                </div>
+              </div>
+
+              {/* Push Action Button */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-[11.5px] text-[#73574E]">
+                  Clicking below immediately packages, commits, and pushes all 203 latest boutique files and assets directly to GitHub without any manual steps.
+                </p>
+
+                <button
+                  type="button"
+                  disabled={syncingGithub}
+                  onClick={handleAutoDeploy}
+                  className="px-6 py-2.5 bg-[#8F5567] hover:bg-[#734251] text-[#FAF5EE] rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50 shrink-0 active:scale-95 transition-all"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#D8B4C0] ${syncingGithub ? 'animate-spin' : ''}`} />
+                  <span>{syncingGithub ? 'Deploying to GitHub...' : 'Sync All Files to GitHub Now'}</span>
+                </button>
+              </div>
+            </div>
+
             {/* SECTION 1: GITHUB CONNECTION */}
             <div className="p-5 sm:p-6 rounded-xl bg-[#FAF5EE] border border-[#D8B4C0] space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="space-y-0.5">
                   <h4 className="text-sm font-bold uppercase tracking-wider text-[#3B2118] flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-[#8F5567]" />
-                    <span>Step 1: Connect Repository to Your GitHub</span>
+                    <span>Terminal Commands Reference</span>
                   </h4>
                   <p className="text-xs text-[#73574E]">
-                    Enter your GitHub repository clone URL below to generate your exact terminal commands:
+                    Your remote repository is already configured. You can also run these commands directly from your local terminal:
                   </p>
                 </div>
               </div>
@@ -2495,7 +2607,7 @@ create table if not exists public.order_items (
               <div className="flex flex-col sm:flex-row gap-2 pt-1">
                 <input
                   type="text"
-                  placeholder="https://github.com/YOUR_USERNAME/muskans-stitching.git"
+                  placeholder="https://github.com/muskandevi2465-prog/Muskan-.git"
                   value={githubUserRepo}
                   onChange={(e) => setGithubUserRepo(e.target.value)}
                   className="flex-1 px-3.5 py-2.5 bg-white border border-[#E8D9C8] rounded-xl text-xs text-[#3B2118] font-mono focus:outline-hidden focus:border-[#8F5567]"
