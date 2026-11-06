@@ -1,0 +1,6 @@
+{
+  "name": "STITCHORA - Luxury Indian Fashion & Designer Wear",
+  "description": "Premium luxury fashion boutique featuring handcrafted ethnic suits, tiered georgette ensembles, co-ord sets, and festive designer wear. Stitched for You.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
