@@ -563,5 +563,14 @@ export const api = {
     if (!res.ok) throw new Error(data.error || 'Failed to send inquiry');
     return data;
   },
+
+  async getDeploymentStatus(): Promise<any> {
+    const res = await fetch(`${API_BASE}/admin/deployment/status`, {
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to fetch deployment status');
+    return data;
+  },
 };
 
